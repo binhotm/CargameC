@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <locale.h>
 #include <math.h>
 #include <ctype.h>
@@ -105,50 +106,104 @@ void limparJogo(char campo[MAXTAM][MAXTAM])
     }
 }
 
-float calcularQtdLetras(int dimL, int dimC, float *qtdLetras)
+float calcularQtdLetras(int dimL, int dimC)
 {
-	float dicas = 0;
-    *qtdLetras = roundf((dimL * dimC)/2);
-    
-    dicas = roundf((dimL * dimC)%2);
-	     
-    return dicas;
+    return roundf((dimL * dimC)/2);
 }
 
-void preencherTabuleiro(float qtdLetras, char campo[MAXTAM][MAXTAM], int dimL, int dimC, float dicas)
+float calcularDicas(int dimL, int dimC)
+{    
+	return roundf((dimL * dimC)%2);	
+}
+
+bool verificaLetra(char letra, char campo[MAXTAM][MAXTAM]){
+	
+	int l, c;
+
+    for (l=0; l<MAXTAM; l++)
+    {
+        for (c=0; c<MAXTAM; c++)
+        {
+            
+			if (campo[l][c] == letra){
+				return true;
+			}	
+	
+        }
+    }
+    
+    return false;	
+}
+
+void adicionaDica(char campo[MAXTAM][MAXTAM]){
+	
+	int l, c;
+
+    for (l=0; l<MAXTAM; l++)
+    {
+        for (c=0; c<MAXTAM; c++)
+        {
+            
+			if (campo[l][c] == '#'){
+				campo[l][c]='?';
+			}	
+	
+        }
+    }
+}
+
+void writeSpaces(float qtdLetras,float dicas, char campo[MAXTAM][MAXTAM], int dimL, int dimC)
 {
-    int i, lAlet, cAlet, j, cAlet2, lAlet2;
-    int totalLetras = 0;
+	int i, lAlet, cAlet, qtLetras;   
     char letra;
+    
+    qtLetras = (int)qtdLetras; 
+	int d = (int)dicas;    
 
     srand((unsigned)time(NULL)); // Geracao da semente para gerar numeros randomicos diferentes
-    
-    
-	for(i=1; i<=qtdLetras; i++)
+       
+	while(qtLetras > 0)
     {
         letra = toupper('a' + (char)(rand()%26)); //gero uma letra random
-		
-		while(totalLetras >= MAXLETRASIGUAIS){			
+        int totalLetras = 1;
+        bool ret = verificaLetra(letra, campo);
+        
+    	printf("LETRA JA USADA?: %b\n", ret);
+        
+        //Verifica se Letra ja foi lancada
+        if(ret == false){
+        		while(totalLetras <= MAXLETRASIGUAIS){			
 				  
-	        lAlet = getRandL(dimL);    // Numero aleatorio para a linha
-	        cAlet = getRandC(dimC);     // Namero aleatorio para a coluna
-	        
-	        printf("LINHA: %i \n", lAlet);
-	        printf("COLUNA: %i  \n", cAlet);
-	        printf("CARACTER: %c \n", letra);
-	        
-				   
-	        if (campo[lAlet][cAlet] == '#')
-	        {
-	            campo[lAlet][cAlet] = letra;  
-	            totalLetras++;
-	        }	
-			
-		}
+			        lAlet = getRandL(dimL);    // Numero aleatorio para a linha
+			        cAlet = getRandC(dimC);    // Namero aleatorio para a coluna       
+			    		   
+			        if (campo[lAlet][cAlet] == '#')
+			        {
+			            campo[lAlet][cAlet] = letra;  
+			            totalLetras++;
+			        }				
+				}				
+					
+				qtLetras--;	
 		
-		i--;		     
+		}	     
              
    }
+   
+   //Dica 
+	if(d > 0){
+		adicionaDica(campo);
+	}  	
+   
+}
+
+bool validaEntrada(int coluna, int linha){
+	if ((coluna < MINTAM || coluna > MAXTAM) || (linha < MINTAM || linha > MAXTAM)){
+		printf("\n Entre com uma COLUNA ou LINHA VALIDA! \n");
+		return false;
+	}else{
+		return true;
+	}
 }
 
 void criaHeader(){
@@ -168,32 +223,57 @@ int main()
     float qtdLetras = 0;
     float dicas = 0;
     float qtdJogadas = 0;
-    int res;
-
+	
+	//Linhas e colunas Jogadas
+	int cPlay, lPlay;
+	
     // Configura o software para português (permitindo utilizar acentuações)
     setlocale(LC_CTYPE, "portuguese");
 
     // 1 Passo - Usuário escolhe as dimensões
     definirDimensoes(&dimL, &dimC);
     
-    dicas = calcularQtdLetras(dimL, dimC, &qtdLetras);
-    criaHeader();    
-    printf("#==============================================================#\n");
-    printf("\t\t Info: Jogo com dimensoes %d X %d\n", dimL, dimC);
-    printf("\t\tSeu jogo terá %.f Letras. E %.f Dicas. \n", qtdLetras, dicas);   
-	printf("#==============================================================#\n");
-    // 2 Passo - Calculo a qtde de Letras e Dicas
-   
+    //Calcula Letras e Dicas
+    qtdLetras = calcularQtdLetras(dimL, dimC);
+    dicas = calcularDicas(dimL, dimC);
     
+    printf("\t\tSeu jogo terá %.f Letras. E %.f Dicas. \n", qtdLetras, dicas);  
+     
     // 3 Passo - Limpar campo colocando '#'
     limparJogo(campo);
     
     // 4 Passo - Preencher os espacos do Tabuleiro
-    preencherTabuleiro(qtdLetras, campo, dimL, dimC, dicas);
-    
-    mostrarJogo(campo, dimL, dimC);
+    writeSpaces(qtdLetras,dicas, campo, dimL, dimC);
     
     
-    return 0;
+    while(true){
+    	system("cls");
+    	
+    	criaHeader();    
+	    printf("#==============================================================#\n");
+	    printf("\t\t Info: Jogo com dimensoes %d X %d\n", dimL, dimC);
+	    printf("\t\tSeu jogo terá %.f Letras. E %.f Dicas. \n", qtdLetras, dicas);   
+	    printf("\t\tJogadas: %d", qtdJogadas);
+		printf("#==============================================================#\n");
+	    	
+    	printf("Entre com a linha e Coluna: ex: 1 4 \n");
+    	scanf("%d %d", &lPlay, &cPlay);
+		
+		if(!validaEntrada(cPlay, lPlay)){
+			system("pause");
+			continue;
+		}
+		    	
+    	printf("Você jogou LINHA %d -  COLUNA %d \n", lPlay, cPlay);
+    	
+    	mostrarJogo(campo, dimL, dimC);
+    	
+    	system("pause");
+    	
+    	qtdJogadas++; 
+	}
     
+
+        
+    return 0;    
 }

@@ -1,0 +1,11 @@
+﻿  main.c
+c:\users\digiage\source\c\cargamec\main.c(39): warning C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.16299.0\ucrt\stdio.h(1272): note: consulte a declaração de 'scanf'
+c:\users\digiage\source\c\cargamec\main.c(54): warning C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.16299.0\ucrt\stdio.h(1272): note: consulte a declaração de 'scanf'
+c:\users\digiage\source\c\cargamec\main.c(111): warning C4244: 'função': conversão de 'int' para 'float', possível perda de dados
+c:\users\digiage\source\c\cargamec\main.c(113): warning C4244: 'função': conversão de 'int' para 'float', possível perda de dados
+c:\users\digiage\source\c\cargamec\main.c(166): warning C4101: 'tela': variável local não referenciada
+c:\users\digiage\source\c\cargamec\main.c(171): warning C4101: 'res': variável local não referenciada
+MSVCRTD.lib(exe_winmain.obj) : error LNK2019: símbolo externo indefinido _WinMain@16 referenciado na função "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
+C:\Users\Digiage\source\c\CargameC\Debug\CargameC.exe : fatal error LNK1120: 1 externo não resolvidos
