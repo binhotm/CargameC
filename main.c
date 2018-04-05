@@ -2,18 +2,19 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <math.h>
+#include <ctype.h>
 #include <time.h>
 
-#define TAM 7
+#define MAXTAM 7
 
 void definirDimensoes(int *pdimL, int *pdimC)
 {
     do
     {
-        printf("\n Entre com a qtd de linhas do seu campo (>=3 e <=%i): ", TAM);
+        printf("\n Entre com a qtd de linhas do seu campo (>=3 e <=%i): ", MAXTAM);
         scanf("%d", pdimL);
 
-        if(*pdimL < 3 || *pdimL > TAM)
+        if(*pdimL < 3 || *pdimL > MAXTAM)
         {
             printf("\n Qtd de Linhas inválida! Tente novamente...");
             fflush(stdin);
@@ -21,14 +22,14 @@ void definirDimensoes(int *pdimL, int *pdimC)
         }
         system("cls");
     }
-    while(*pdimL < 3 || *pdimL > TAM);
+    while(*pdimL < 3 || *pdimL > MAXTAM);
 
     do
     {
-        printf("\n Entre com a qtd de colunas do seu campo (>=3 e <=%i): ", TAM);
+        printf("\n Entre com a qtd de colunas do seu campo (>=3 e <=%i): ", MAXTAM);
         scanf("%d", pdimC);
 
-        if(*pdimC < 3 || *pdimC > TAM)
+        if(*pdimC < 3 || *pdimC > MAXTAM)
         {
             printf("\n Qtd de Colunas inválida! Tente novamente...");
             fflush(stdin);
@@ -36,11 +37,11 @@ void definirDimensoes(int *pdimL, int *pdimC)
         }
         system("cls");
     }
-    while(*pdimC < 3 || *pdimC > TAM);
+    while(*pdimC < 3 || *pdimC > MAXTAM);
 
 }
 
-void mostrarJogo(char campo[TAM][TAM], int dimL, int dimC)
+void mostrarJogo(char campo[MAXTAM][MAXTAM], int dimL, int dimC)
 {
     int l, c;
 
@@ -67,59 +68,68 @@ void mostrarJogo(char campo[TAM][TAM], int dimL, int dimC)
     }
 }
 
-void limparJogo(char campo[TAM][TAM])
+void limparJogo(char campo[MAXTAM][MAXTAM])
 {
     int l, c;
 
-    for (l=0; l<TAM; l++)
+    for (l=0; l<MAXTAM; l++)
     {
-        for (c=0; c<TAM; c++)
+        for (c=0; c<MAXTAM; c++)
         {
             campo[l][c]='#';
         }
     }
 }
 
-void calcularQtdLetras(int dimL, int dimC, float *qtdLetras)
+float calcularQtdLetras(int dimL, int dimC, float *qtdLetras)
 {
-    float dica;
+	float dicas = 0;
     *qtdLetras = roundf((dimL * dimC)/2);
     
-    dica = roundf((dimL * dimC)%2);
+    dicas = roundf((dimL * dimC)%2);
 
-    printf("\nSeu jogo terá %.f Letras. E %.f Dicas.", *qtdLetras, dica);
+    printf("\nSeu jogo terá %.f Letras. E %.f Dicas. \n", *qtdLetras, dicas);
+    
+    return dicas;
 }
 
-void lancarLetras(float qtdLetras, char campo[TAM][TAM], int dimL, int dimC)
+void preencherTabuleiro(float qtdLetras, char campo[MAXTAM][MAXTAM], int dimL, int dimC, float dicas)
 {
     int i, lAlet, cAlet, j, cAlet2, lAlet2;
     char letra;
 
     srand((unsigned)time(NULL) ); // Geracao da semente para gerar numeros randomicos diferentes
-    for(i=1; i<=qtdLetras; i++)
+    
+    
+	for(i=1; i<=qtdLetras; i++)
     {
-        letra = 'a' + (char)(rand()%26); //gero uma letra random
-        
-        
+        letra = toupper('a' + (char)(rand()%26)); //gero uma letra random
+      
+		//	printf("Letra ramdon %c \n", letra);       
         
         lAlet = rand()%dimL;     // Numero aleatorio para a linha
         cAlet = rand()%dimC;     // Namero aleatorio para a coluna
+        
+        printf("LINHA: %i \n", lAlet);
+        printf("COLUNA: %i  \n", cAlet);
+        printf("CARACTER: %c \n", letra);
+        
         
         if (campo[lAlet][cAlet] == '#')
         {
             
             for(j=1; j<=2; j++){
                 //Aqui eu lanco as letras duas vezes, para preencher o Tabuleiro
-                campo[lAlet][cAlet] = toupper(letra);
+                campo[lAlet][cAlet] = letra;
             
                 lAlet = rand()%dimL;     // Numero aleatorio para a linha
                 cAlet = rand()%dimC;     // Numero aleatorio para a coluna
                 
                 if (campo[lAlet][cAlet] == '#'){
-                    campo[lAlet][cAlet] = toupper(letra);
+                    campo[lAlet][cAlet] = letra;
                 } else {
-                    printf("\n %c %c", toupper(campo[lAlet][cAlet]), toupper(letra));
-                    if(campo[lAlet][cAlet] == toupper(letra)){
+                
+                    if(campo[lAlet][cAlet] == letra){
                         campo[lAlet][cAlet] = '#'; 
                         i--;
                     } 
@@ -137,10 +147,11 @@ void lancarLetras(float qtdLetras, char campo[TAM][TAM], int dimL, int dimC)
 
 int main()
 {
-    char campo[TAM][TAM];
-    char tela[TAM][TAM];
+    char campo[MAXTAM][MAXTAM];
+    char tela[MAXTAM][MAXTAM];
     int dimL = 0, dimC = 0;
     float qtdLetras = 0;
+    float dicas = 0;
     float qtdJogadas = 0;
     int res;
 
@@ -152,14 +163,14 @@ int main()
     printf("\n Jogo com dimensoes %d X %d\n", dimL, dimC);
 
     // 2 Passo - Calculo a qtde de Letras e Dicas
-    calcularQtdLetras(dimL, dimC, &qtdLetras);
+    dicas = calcularQtdLetras(dimL, dimC, &qtdLetras);
     
     // 3 Passo - Limpar campo colocando '#'
     limparJogo(campo);
-    mostrarJogo(campo, dimL, dimC);
     
-    // 4 Passo - Lancar Letras
-    lancarLetras(qtdLetras, campo, dimL, dimC);
+    // 4 Passo - Preencher os espacos do Tabuleiro
+    preencherTabuleiro(qtdLetras, campo, dimL, dimC, dicas);
+    
     mostrarJogo(campo, dimL, dimC);
     
     
