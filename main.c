@@ -5,6 +5,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <time.h>
+#include <conio.h>
 
 #define MAXTAM 7
 #define MINTAM 3
@@ -69,27 +70,43 @@ void definirDimensoes(int *pdimL, int *pdimC)
 void mostrarJogo(char campo[MAXTAM][MAXTAM], int dimL, int dimC)
 {
     int l, c;
-
+    char c1 = '-';
+	    
     printf("\n");
-
+	
+	printf("     ");
     // Imprimir legenda da coluna
-    printf("   ");
     for (c=1; c<dimC+1; c++)
     {
-        printf("%2i ", c);
+        printf(" %3d ", c);
+        
     }
-    printf("\n");
+     	
+ 	printf("\n");
+ 	printf("     ");
+ 
+    
+    for (c=1; c<dimC+1; c++)
+    {
+        printf(" %3c ", c1);
+        
+    }
+ 	
+ 	printf("\n");
 
     // Imprimir celulas da matriz
     for (l=0; l<dimL; l++)
     {
-        printf("%2i ", l+1);
-
+   		
+   		printf(" %3d|", l+1);
+        
         for (c=0; c<dimC; c++)
         {
-            printf(" %c ", campo[l][c]);
+          
+			printf(" %3c ", campo[l][c]);
+		
         }
-        printf("\n");
+        printf("\n\n");
     }
 }
 
@@ -167,9 +184,7 @@ void writeSpaces(float qtdLetras,float dicas, char campo[MAXTAM][MAXTAM], int di
         letra = toupper('a' + (char)(rand()%26)); //gero uma letra random
         int totalLetras = 1;
         bool ret = verificaLetra(letra, campo);
-        
-    	printf("LETRA JA USADA?: %b\n", ret);
-        
+          
         //Verifica se Letra ja foi lancada
         if(ret == false){
         		while(totalLetras <= MAXLETRASIGUAIS){			
@@ -198,8 +213,8 @@ void writeSpaces(float qtdLetras,float dicas, char campo[MAXTAM][MAXTAM], int di
 }
 
 bool validaEntrada(int coluna, int linha){
-	if ((coluna < MINTAM || coluna > MAXTAM) || (linha < MINTAM || linha > MAXTAM)){
-		printf("\n Entre com uma COLUNA ou LINHA VALIDA! \n");
+	if ((coluna < 1 || coluna > MAXTAM) || (linha < 1 || linha > MAXTAM)){
+		printf("Entre com uma COLUNA ou LINHA VALIDA! \n");
 		return false;
 	}else{
 		return true;
@@ -212,7 +227,7 @@ void criaHeader(){
 	printf("       (   _   _   _     _ ) _     )\\/)  _   _ _   _   _ o  _  \n");
 	printf("     \\__) (_) (_( (_)   (_( (_(   (  (  )_) ) ) ) (_) )  ( (_( \n");
 	printf("                _)                     (_                      \n");
-	printf("================================================================\n");
+
 }
 
 int main()
@@ -223,7 +238,8 @@ int main()
     float qtdLetras = 0;
     float dicas = 0;
     float qtdJogadas = 0;
-	
+    
+
 	//Linhas e colunas Jogadas
 	int cPlay, lPlay;
 	
@@ -253,10 +269,12 @@ int main()
 	    printf("#==============================================================#\n");
 	    printf("\t\t Info: Jogo com dimensoes %d X %d\n", dimL, dimC);
 	    printf("\t\tSeu jogo terá %.f Letras. E %.f Dicas. \n", qtdLetras, dicas);   
-	    printf("\t\tJogadas: %d", qtdJogadas);
+	    printf("\t\tJogadas: %d \n", qtdJogadas);
 		printf("#==============================================================#\n");
+		
+		mostrarJogo(campo, dimL, dimC);
 	    	
-    	printf("Entre com a linha e Coluna: ex: 1 4 \n");
+    	printf("Entre com a linha e Coluna: ex: \n");
     	scanf("%d %d", &lPlay, &cPlay);
 		
 		if(!validaEntrada(cPlay, lPlay)){
@@ -264,13 +282,7 @@ int main()
 			continue;
 		}
 		    	
-    	printf("Você jogou LINHA %d -  COLUNA %d \n", lPlay, cPlay);
-    	
-    	mostrarJogo(campo, dimL, dimC);
-    	
-    	system("pause");
-    	
-    	qtdJogadas++; 
+    	qtdJogadas = qtdJogadas + 1; 
 	}
     
 
