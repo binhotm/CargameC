@@ -49,9 +49,6 @@ void configHead(){
 void definirDimensoes(int *pdimL, int *pdimC)
 {
 	
-
-
-	
     do
     {
     	configHead();
@@ -187,6 +184,34 @@ void adicionaDica(char campo[MAXTAM][MAXTAM]){
     }
 }
 
+int * findNextLetter(char campo[MAXTAM][MAXTAM], int oldPosL, int oldPosC){  
+		
+	int l, c;
+	
+	static int find[MINTAM];
+
+    for (l=0; l<MAXTAM; l++)
+    {
+        for (c=0; c<MAXTAM; c++)
+        {        	
+        	
+        	if(campo[l][c] == campo[oldPosL][oldPosC]){
+        	
+				if( oldPosL != l && oldPosC != c){
+        			find[0] = l;
+        			find[1] = c;        			
+				}
+				
+			}
+        	
+	
+        }
+    }
+    
+    return find;
+
+}
+
 void writeSpaces(float qtdLetras,float dicas, char campo[MAXTAM][MAXTAM], int dimL, int dimC)
 {
 	int i, lAlet, cAlet, qtLetras;   
@@ -217,10 +242,8 @@ void writeSpaces(float qtdLetras,float dicas, char campo[MAXTAM][MAXTAM], int di
 			        }				
 				}				
 					
-				qtLetras--;	
-		
-		}	     
-             
+				qtLetras--;			
+		}	                  
    }
    
    //Dica 
@@ -236,7 +259,7 @@ bool validaEntrada(char tela[MAXTAM][MAXTAM], int linha, int coluna){
 		return false;
 	}else{
 		
-		if(tela[linha - 1][coluna-1] != '#'){
+		if(tela[linha - 1][coluna-1] != '#' ){
 			printf("Campo ja utilizado!\n");
 			return false;
 		}			
@@ -245,7 +268,18 @@ bool validaEntrada(char tela[MAXTAM][MAXTAM], int linha, int coluna){
 	}
 }
 
-char mostraCampo(char tela[MAXTAM][MAXTAM], char campo[MAXTAM][MAXTAM], int posicaoL, int posicaoC, int dmL, int dmC, float qtdLetras, float dicas, int qtdJogadas){
+char mostraCampo(char tela[MAXTAM][MAXTAM], char campo[MAXTAM][MAXTAM], int posicaoL, int posicaoC, int dmL, int dmC, float qtdLetras, float dicas, int qtdJogadas,  ){
+	
+	//Dado da ultima letra jogada
+	//Dado da ultima posical jogada
+	char nextLetter1, nextLetter2;
+	bool hasLetra = false;
+	int *vetorFound;
+	
+	if(oldPosL != 9999 && oldPosC != 9999){
+		hasLetra = true;
+	}
+
 	
 	posicaoL = posicaoL - 1;
 	posicaoC = posicaoC - 1;	
@@ -255,15 +289,55 @@ char mostraCampo(char tela[MAXTAM][MAXTAM], char campo[MAXTAM][MAXTAM], int posi
 		tela[posicaoL][posicaoC] = campo[posicaoL][posicaoC];	
 		
 		showHeader(dmL, dmC, qtdLetras, dicas, qtdJogadas);
-		mostrarJogo( tela, dmL, dmC);	
+		mostrarJogo(tela, dmL, dmC);	
 		
 		return tela[posicaoL][posicaoC];
 	
 	}else{
 		if(tela[posicaoL][posicaoC] == '?'){
 			
+			if(hasLetra){
+				
+				
+			
+			
+			}else{
+								
+				printf("\n\nNAO TEM LETRA ANTERIOR\n\n");
+				system("pause");
+				
+			}
+		
 		}
+		
+		
 	}
+	
+}
+
+bool verificaFim(char tela[MAXTAM][MAXTAM],int totalLetras){
+	
+	int letrasCount = 0;
+	int l, c;
+
+    for (l=0; l<MAXTAM; l++)
+    {
+        for (c=0; c<MAXTAM; c++)
+        {
+            
+			if(tela[l][c] != '#' ){
+				letrasCount++;
+			}			
+		
+        }
+    }
+    
+    
+    if(totalLetras == letrasCount){
+    	return false;
+	}else{
+		return true;
+	}	
 	
 }
 
@@ -320,15 +394,14 @@ int main()
     
     // 4 Passo - Preencher os espacos do Tabuleiro
     writeSpaces(qtdLetras,dicas, campo, dimL, dimC);
-    
-    
+        
     while(gameOn){
     	
     	//Cria cabecalho formatado
 		showHeader(dimL, dimC, qtdLetras, dicas, qtdJogadas);
     	
 		mostrarJogo(tela, dimL, dimC);
-		//mostrarJogo(campo, dimL, dimC);
+		mostrarJogo(campo, dimL, dimC);
 	    	
     	printf("Entre com a linha e Coluna: ex: \n");
     	scanf("%d %d", &lPlay1, &cPlay1);
@@ -338,7 +411,7 @@ int main()
 			continue;
 		}		
 
-		letra1 = mostraCampo(tela, campo, lPlay1, cPlay1, dimL, dimC, qtdLetras, dicas, qtdJogadas);
+		letra1 = mostraCampo(tela, campo, lPlay1, cPlay1, dimL, dimC, qtdLetras, dicas, qtdJogadas, 9999,9999);
 		
 		
 		printf("Entre com a linha e Coluna: ex: \n");
@@ -349,7 +422,7 @@ int main()
 			continue;
 		}
 		
-		letra2 = mostraCampo(tela, campo, lPlay2, cPlay2, dimL, dimC, qtdLetras, dicas, qtdJogadas);
+		letra2 = mostraCampo(tela, campo, lPlay2, cPlay2, dimL, dimC, qtdLetras, dicas, qtdJogadas, lPlay1, cPlay1);
 		
 		
 		if( letra1 != letra2){			
@@ -360,7 +433,27 @@ int main()
 		}	
 		    	
     	qtdJogadas++; 
+    	
+    	gameOn = verificaFim(tela,qtdLetras);
+    	
 	}
+	
+	/*
+	printf("#==============================================================#\n");
+	printf("\t\t Jogo da Memoria:\n");	
+    printf("\t\tFim do jogo!\n");
+	printf("#==============================================================#\n");
+	printf("#==============> Você utilzou %d jogadas \n", qtdJogadas);
+	
+	if(){
+		printf("#==============> VOCÊ PRECISA TREINAR MAIS SUA MEMÓRIA ...");
+	}else{
+		printf("#==============> PARABÉNS! VOCÊ É BOM DE MEMÓRIA ...");
+	}
+	*/
+	
+	
+	system("pause");
     
 
         
