@@ -6,9 +6,10 @@
 #include <ctype.h>
 #include <time.h>
 #include <conio.h>
+#include <windows.h>
 
-#define MAXTAM 7
 #define MINTAM 3
+#define MAXTAM 7
 #define MAXLETRASIGUAIS 2
 
 /***
@@ -33,12 +34,29 @@ int getRandC(dimC){
 	return rand()%dimC; //Retonar numero aleatorio da Coluna
 }
 
+
+void configHead(){
+	
+	printf("#==============================================================#\n");
+	printf("\t\t Jogo da Memoria:\n");	
+    printf("\tConfigurações de Campo:\n");
+    printf("\tEntre com a qtd de linhas do seu campo (>=3 e <=%i): \n", MAXTAM);      
+	printf("#==============================================================#\n");
+		
+	printf("=====> ");
+}
+
 void definirDimensoes(int *pdimL, int *pdimC)
 {
+	
+
+
+	
     do
     {
-        printf("\n Entre com a qtd de linhas do seu campo (>=3 e <=%i): ", MAXTAM);
+    	configHead();
         scanf("%d", pdimL);
+        
 
         if(*pdimL < MINTAM || *pdimL > MAXTAM)
         {
@@ -52,7 +70,7 @@ void definirDimensoes(int *pdimL, int *pdimC)
 
     do
     {
-        printf("\n Entre com a qtd de colunas do seu campo (>=3 e <=%i): ", MAXTAM);
+    	configHead();
         scanf("%d", pdimC);
 
         if(*pdimC < MINTAM || *pdimC > MAXTAM)
@@ -212,13 +230,41 @@ void writeSpaces(float qtdLetras,float dicas, char campo[MAXTAM][MAXTAM], int di
    
 }
 
-bool validaEntrada(int coluna, int linha){
+bool validaEntrada(char tela[MAXTAM][MAXTAM], int linha, int coluna){
 	if ((coluna < 1 || coluna > MAXTAM) || (linha < 1 || linha > MAXTAM)){
 		printf("Entre com uma COLUNA ou LINHA VALIDA! \n");
 		return false;
 	}else{
+		
+		if(tela[linha - 1][coluna-1] != '#'){
+			printf("Campo ja utilizado!\n");
+			return false;
+		}			
+		
 		return true;
 	}
+}
+
+char mostraCampo(char tela[MAXTAM][MAXTAM], char campo[MAXTAM][MAXTAM], int posicaoL, int posicaoC, int dmL, int dmC, float qtdLetras, float dicas, int qtdJogadas){
+	
+	posicaoL = posicaoL - 1;
+	posicaoC = posicaoC - 1;	
+		
+	if (tela[posicaoL][posicaoC] == '#'){		
+		
+		tela[posicaoL][posicaoC] = campo[posicaoL][posicaoC];	
+		
+		showHeader(dmL, dmC, qtdLetras, dicas, qtdJogadas);
+		mostrarJogo( tela, dmL, dmC);	
+		
+		return tela[posicaoL][posicaoC];
+	
+	}else{
+		if(tela[posicaoL][posicaoC] == '?'){
+			
+		}
+	}
+	
 }
 
 void criaHeader(){
@@ -227,7 +273,18 @@ void criaHeader(){
 	printf("       (   _   _   _     _ ) _     )\\/)  _   _ _   _   _ o  _  \n");
 	printf("     \\__) (_) (_( (_)   (_( (_(   (  (  )_) ) ) ) (_) )  ( (_( \n");
 	printf("                _)                     (_                      \n");
+	printf("por: Fabricio Junior da Silva\n");
+	printf("por: Vagner Alves Leite\n");
+}
 
+void showHeader(int dimL, int dimC, float qtdLetras, float dicas, int qtdJogadas){
+		system("cls");
+		criaHeader();    
+	    printf("#==============================================================#\n");
+	    printf("\t\t Info: Jogo com dimensoes %d X %d\n", dimL, dimC);
+	    printf("\t\tSeu jogo terá %.f Letras. E %.f Dicas. \n", qtdLetras, dicas);   
+	    printf("\t\tJogadas: %d \n", qtdJogadas);
+		printf("#==============================================================#\n");
 }
 
 int main()
@@ -237,11 +294,13 @@ int main()
     int dimL = 0, dimC = 0;
     float qtdLetras = 0;
     float dicas = 0;
-    float qtdJogadas = 0;
+    int qtdJogadas = 0;
+    bool gameOn = true;
     
+    char letra1, letra2;
 
 	//Linhas e colunas Jogadas
-	int cPlay, lPlay;
+	int cPlay1, lPlay1, cPlay2, lPlay2;
 	
     // Configura o software para português (permitindo utilizar acentuações)
     setlocale(LC_CTYPE, "portuguese");
@@ -257,32 +316,50 @@ int main()
      
     // 3 Passo - Limpar campo colocando '#'
     limparJogo(campo);
+    limparJogo(tela);
     
     // 4 Passo - Preencher os espacos do Tabuleiro
     writeSpaces(qtdLetras,dicas, campo, dimL, dimC);
     
     
-    while(true){
-    	system("cls");
+    while(gameOn){
     	
-    	criaHeader();    
-	    printf("#==============================================================#\n");
-	    printf("\t\t Info: Jogo com dimensoes %d X %d\n", dimL, dimC);
-	    printf("\t\tSeu jogo terá %.f Letras. E %.f Dicas. \n", qtdLetras, dicas);   
-	    printf("\t\tJogadas: %d \n", qtdJogadas);
-		printf("#==============================================================#\n");
-		
-		mostrarJogo(campo, dimL, dimC);
+    	//Cria cabecalho formatado
+		showHeader(dimL, dimC, qtdLetras, dicas, qtdJogadas);
+    	
+		mostrarJogo(tela, dimL, dimC);
+		//mostrarJogo(campo, dimL, dimC);
 	    	
     	printf("Entre com a linha e Coluna: ex: \n");
-    	scanf("%d %d", &lPlay, &cPlay);
+    	scanf("%d %d", &lPlay1, &cPlay1);
 		
-		if(!validaEntrada(cPlay, lPlay)){
+		if(!validaEntrada(tela, lPlay1, cPlay1)){
+			system("pause");
+			continue;
+		}		
+
+		letra1 = mostraCampo(tela, campo, lPlay1, cPlay1, dimL, dimC, qtdLetras, dicas, qtdJogadas);
+		
+		
+		printf("Entre com a linha e Coluna: ex: \n");
+    	scanf("%d %d", &lPlay2, &cPlay2);
+		
+		if(!validaEntrada(tela, cPlay2, lPlay2)){
 			system("pause");
 			continue;
 		}
+		
+		letra2 = mostraCampo(tela, campo, lPlay2, cPlay2, dimL, dimC, qtdLetras, dicas, qtdJogadas);
+		
+		
+		if( letra1 != letra2){			
+			sleep(3);
+			
+			tela[lPlay1-1][cPlay1-1] = '#';
+			tela[lPlay2-1][cPlay2-1] = '#';			
+		}	
 		    	
-    	qtdJogadas = qtdJogadas + 1; 
+    	qtdJogadas++; 
 	}
     
 
